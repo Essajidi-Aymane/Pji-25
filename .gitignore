@@ -1,0 +1,8 @@
+# Ignorer les fichiers générés par Maven
+/target/
+
+# Ignorer les fichiers temporaires d'IDE
+*.iml
+.idea/
+*.log
+/src/main/resources/params
