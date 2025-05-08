@@ -6,6 +6,7 @@ import it.unisa.dia.gas.plaf.jpbc.pairing.PairingFactory;
 import java.security.MessageDigest;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 public class TA {
 
@@ -30,30 +31,33 @@ public class TA {
             System.out.println("TA setup terminé");
         }
 
-        public UserKeys keygen(String userId) {
+        public UserKeys keygen(String userId, Set<String> attributes) {
             Field Zp = pairing.getZr();
             Field G1 = pairing.getG1();
 
             Element s_i = Zp.newRandomElement().getImmutable() ;
             Element z_i = Zp.newRandomElement().getImmutable();
-            Element h2_u = H2(userId, Zp);
-            Element h2_us = H2(userId + s_i.toString(), Zp);
-            Element h1_u = H1(userId, G1);
-
-            Element inv_h2_us = h2_us.invert() ;
-
-            Element tk1 = h2_u.powZn(inv_h2_us).getImmutable() ;
-            Element tk2 = h1_u.powZn(inv_h2_us).getImmutable() ;
-
-            Element up1 = g.powZn(inv_h2_us).getImmutable();
-            Element up2 = h1_u.powZn(inv_h2_us).getImmutable() ;
-
-            Map<String, Element[]> tkMap = new HashMap<>() ;
-            tkMap.put(userId, new Element[]{tk1,tk2}) ;
-
+            Map<String, Element[]> tkMap = new HashMap<>();
             Map<String, Element[]> ukMap = new HashMap<>();
-            ukMap.put(userId, new Element[]{up1, up2});
 
+            for (String attr : attributes) {
+
+                Element h2_u = H2(attr, Zp);
+                Element h2_us = H2(attr + s_i.toString(), Zp);
+                Element h1_u = H1(attr, G1);
+
+                Element inv_h2_us = h2_us.invert();
+
+                Element tk1 = h2_u.powZn(inv_h2_us).getImmutable();
+                Element tk2 = h1_u.powZn(inv_h2_us).getImmutable();
+
+                Element up1 = g.powZn(inv_h2_us).getImmutable();
+                Element up2 = h1_u.powZn(inv_h2_us).getImmutable();
+
+                tkMap.put(attr, new Element[]{tk1, tk2});
+
+                ukMap.put(attr, new Element[]{up1, up2});
+            }
             return new UserKeys(s_i, z_i, tkMap, ukMap);
 
         }
