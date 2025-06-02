@@ -31,36 +31,38 @@ public class TA {
             System.out.println("TA setup terminé");
         }
 
-        public UserKeys keygen(String userId, Set<String> attributes) {
-            Field Zp = pairing.getZr();
-            Field G1 = pairing.getG1();
+    public UserKeys keygen(String userId, Set<String> attributes) {
+        Field Zp = pairing.getZr();
+        Field G1 = pairing.getG1();
 
-            Element s_i = Zp.newRandomElement().getImmutable() ;
-            Element z_i = Zp.newRandomElement().getImmutable();
-            Map<String, Element[]> tkMap = new HashMap<>();
-            Map<String, Element[]> ukMap = new HashMap<>();
+        Element s_i = Zp.newRandomElement().getImmutable();
+        Element z_i = Zp.newRandomElement().getImmutable();
 
-            for (String attr : attributes) {
+        Map<String, Element[]> tkMap = new HashMap<>();
+        Map<String, Element[]> ukMap = new HashMap<>();
 
-                Element h2_u = H2(attr, Zp);
-                Element h2_us = H2(attr + s_i.toString(), Zp);
-                Element h1_u = H1(attr, G1);
+        for (String attr : attributes) {
 
-                Element inv_h2_us = h2_us.invert();
+            Element h2_u = H2(attr, Zp);
+            Element h2_us = H2(attr + s_i.toString(), Zp);
+            Element h1_u = H1(attr, G1);
 
-                Element tk1 = h2_u.powZn(inv_h2_us).getImmutable();
-                Element tk2 = h1_u.powZn(inv_h2_us).getImmutable();
+            Element inv_h2_us = h2_us.invert();
 
-                Element up1 = g.powZn(inv_h2_us).getImmutable();
-                Element up2 = h1_u.powZn(inv_h2_us).getImmutable();
+            Element tk1 = g.powZn(h2_u.mul(inv_h2_us)).getImmutable();
+            Element tk2 = H1(attr, G1).powZn(inv_h2_us).getImmutable();
 
-                tkMap.put(attr, new Element[]{tk1, tk2});
 
-                ukMap.put(attr, new Element[]{up1, up2});
-            }
-            return new UserKeys(s_i, z_i, tkMap, ukMap);
+            Element up1 = g.powZn(inv_h2_us).getImmutable();
+            Element up2 = h1_u.powZn(inv_h2_us).getImmutable();
 
+            tkMap.put(attr, new Element[]{tk1, tk2});
+            ukMap.put(attr, new Element[]{up1, up2});
         }
+
+        return new UserKeys(s_i, z_i, tkMap, ukMap);
+    }
+
 
     private Element H2(String input , Field zp) {
             try {
