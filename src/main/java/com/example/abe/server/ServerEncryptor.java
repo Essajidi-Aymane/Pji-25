@@ -29,7 +29,7 @@ public class ServerEncryptor {
         AccessTreeNode root = AccessPolicyParser.parse(policy);
         applyTreeEncryption(root, up, C0, policyComponents, C1Wrapper);
         Element C1 = C1Wrapper[0];
-        return new CipherText(C0, C1, encMsg, policyComponents);
+        return new CipherText(C0, C1, encMsg, policyComponents, policy );
     }
     private void applyTreeEncryption(
             AccessTreeNode node,

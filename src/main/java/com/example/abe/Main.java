@@ -34,7 +34,7 @@ public class Main {
                 System.out.println("UP for " + attr + ": " + Arrays.toString(up));
             }            String message = "Bonjour PJI";
             //String policy = "student AND iot";
-            String policy = "((student AND niveau2) OR (iot AND prof))";            System.out.println("\n[TEST] Arbre de la politique : " + policy);
+            String policy = "((student OR niveau2) AND (iot OR prof))";            System.out.println("\n[TEST] Arbre de la politique : " + policy);
             AccessTreeNode root = AccessPolicyParser.parse(policy);
             printPolicyTree(root, 0);
 
@@ -58,7 +58,7 @@ public class Main {
                 System.out.println("Clé de transformation introuvable pour l'attribut: " + chosenAttr);
                 return;
             }
-            TransformedCT transCT = serverDecryptor.outDecrypt(ciphertext, tk);
+            TransformedCT transCT = serverDecryptor.outDecrypt(ciphertext, tk, attrs);
             System.out.println("\n [SERVER] Transformed CipherText");
             System.out.println("transformedC1 = " + transCT.transformedC1);
             System.out.println("Encrypted Message = " + transCT.encMsg);
