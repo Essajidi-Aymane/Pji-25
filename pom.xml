@@ -71,7 +71,7 @@
                 <artifactId>exec-maven-plugin</artifactId>
                 <version>3.1.0</version>
                 <configuration>
-                    <mainClass>com.example.abe.Main</mainClass>
+                    <mainClass>com.example.abe.cli.AbeCLI</mainClass>
                 </configuration>
             </plugin>
 
