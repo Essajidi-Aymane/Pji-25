@@ -35,7 +35,9 @@ public class ClientEncryptor {
         // C0 = up1^s
         Element C0 = up[0].powZn(s).getImmutable();
 
-        Element sek = ek.mul(s).getImmutable();
+        Field G1 = pairing.getG1();
+       
+        Element sek = ek.powZn(s).getImmutable();  
         Element K = pairing.pairing(pairing.getG1().newElement().setToOne(), pairing.getG1().newElement().setToOne())
                 .powZn(sek).getImmutable();
 

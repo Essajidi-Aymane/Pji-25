@@ -53,25 +53,42 @@ public  class CipherText {
 
         return gson.toJson(data);
     }
-    public static CipherText fromJson(String json, Pairing pairing) {
-        Gson gson = new Gson();
-        Type mapType = new TypeToken<Map<String, String>>(){}.getType();
-        Map<String, String> data = gson.fromJson(json, mapType);
+      
+public static CipherText fromJson(String json, Pairing pairing) {
+    Gson gson = new Gson();
+    Type mapType = new TypeToken<Map<String, Object>>(){}.getType();
+    Map<String, Object> data = gson.fromJson(json, mapType);
 
-        Element C0 = pairing.getG1().newElementFromBytes(Base64.getDecoder().decode(data.get("C0"))).getImmutable();
-        Element C1 = pairing.getGT().newElementFromBytes(Base64.getDecoder().decode(data.get("C1"))).getImmutable();
-        String encMsg = data.get("encMsg");
-        String policy = data.get("policy");
+    Element C0 = pairing.getG1().newElementFromBytes(
+        Base64.getDecoder().decode((String) data.get("C0"))).getImmutable();
 
-        Type policyType = new TypeToken<Map<String, String>>(){}.getType();
-        Map<String, String> rawMap = gson.fromJson(data.get("policyComponents"), policyType);
-        Map<String, Element> policyComponents = new HashMap<>();
-        for (Map.Entry<String, String> entry : rawMap.entrySet()) {
-            Element e = pairing.getG1().newElementFromBytes(Base64.getDecoder().decode(entry.getValue())).getImmutable();
-            policyComponents.put(entry.getKey(), e);
-        }
+    Element C1 = pairing.getGT().newElementFromBytes(
+        Base64.getDecoder().decode((String) data.get("C1"))).getImmutable();
 
-        return new CipherText(C0, C1, encMsg, policyComponents, policy);
+    String encMsg = (String) data.get("encMsg");
+    String policy = (String) data.get("policy");
+
+    Object pcObj = data.get("policyComponents");
+
+    Map<String, String> rawComponents;
+
+    if (pcObj instanceof String str) {
+        rawComponents = gson.fromJson(str, new TypeToken<Map<String, String>>(){}.getType());
+    } else {
+        rawComponents = gson.fromJson(gson.toJson(pcObj), new TypeToken<Map<String, String>>(){}.getType());
     }
+
+    Map<String, Element> components = new HashMap<>();
+    for (Map.Entry<String, String> entry : rawComponents.entrySet()) {
+        Element e = pairing.getG1()
+            .newElementFromBytes(Base64.getDecoder().decode(entry.getValue()))
+            .getImmutable();
+        components.put(entry.getKey(), e);
+    }
+
+    return new CipherText(C0, C1, encMsg, components, policy);
+}
+
+    
 
 }

@@ -4,7 +4,7 @@ import java.util.List;
 
 public class DecryptRequest {
     private String cipherTextJson;
-    private String tkJson;
+    public  List<String> tkJson;
     private List<String> attrs; // attributs
 
     public List<String> getAttrs() {
@@ -15,7 +15,7 @@ public class DecryptRequest {
         return cipherTextJson;
     }
 
-    public String getTkJson() {
+    public List<String> getTkJson() {
         return tkJson;
     }
 
@@ -27,7 +27,7 @@ public class DecryptRequest {
         this.cipherTextJson = cipherTextJson;
     }
 
-    public void setTkJson(String tkJson) {
+    public void setTkJson(List<String> tkJson) {
         this.tkJson = tkJson;
     }
 }

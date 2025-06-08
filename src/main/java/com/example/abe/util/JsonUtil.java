@@ -3,23 +3,23 @@ package com.example.abe.util;
 import com.example.abe.model.CipherText;
 import com.example.abe.model.PreCiphertext;
 import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 import it.unisa.dia.gas.jpbc.Element;
 import it.unisa.dia.gas.jpbc.Pairing;
 
-import java.lang.reflect.Type;
 import java.util.*;
 
 public class JsonUtil {
-    public static Element[] decodeElementArray(String json, Pairing pairing) {
-        Gson gson = new Gson();
-        String[] base64Array = gson.fromJson(json, String[].class);
-        Element[] result = new Element[base64Array.length];
-        for (int i = 0; i < base64Array.length; i++) {
-            result[i] = pairing.getG1().newElementFromBytes(Base64.getDecoder().decode(base64Array[i])).getImmutable();
-        }
-        return result;
+
+public static Element[] decodeElementArray(List<String> list, Pairing pairing) {
+    Element[] result = new Element[list.size()];
+    for (int i = 0; i < list.size(); i++) {
+        result[i] = pairing.getG1()
+            .newElementFromBytes(Base64.getDecoder().decode(list.get(i)))
+            .getImmutable();
     }
+    return result;
+}
+
     public static String encodeElementArrayMap(Map<String, Element[]> map) {
         Map<String, List<String>> base64Map = new HashMap<>();
         for (Map.Entry<String, Element[]> entry : map.entrySet()) {
@@ -51,18 +51,20 @@ public class JsonUtil {
         map.put("ukJson", encodeElementArrayMap(uk));
         return new Gson().toJson(map);
     }
-    public static Map<String, Element[]> decodeElementArrayMap(String json, Pairing pairing) {
-        Gson gson = new Gson();
-        Type type = new TypeToken<Map<String, List<String>>>(){}.getType();
-        Map<String, List<String>> raw = gson.fromJson(json, type);
-        Map<String, Element[]> result = new HashMap<>();
-        for (Map.Entry<String, List<String>> entry : raw.entrySet()) {
-            Element[] arr = new Element[entry.getValue().size()];
-            for (int i = 0; i < arr.length; i++) {
-                arr[i] = pairing.getG1().newElementFromBytes(Base64.getDecoder().decode(entry.getValue().get(i))).getImmutable();
-            }
-            result.put(entry.getKey(), arr);
+    
+public static Map<String, Element[]> decodeElementArrayMap(Map<String, List<String>> input, Pairing pairing) {
+    Map<String, Element[]> result = new HashMap<>();
+    for (Map.Entry<String, List<String>> entry : input.entrySet()) {
+        List<String> encodedElements = entry.getValue();
+        Element[] elements = new Element[encodedElements.size()];
+        for (int i = 0; i < encodedElements.size(); i++) {
+            elements[i] = pairing.getG1()
+                .newElementFromBytes(Base64.getDecoder().decode(encodedElements.get(i)))
+                .getImmutable();
         }
-        return result;
+        result.put(entry.getKey(), elements);
     }
+    return result;
+}
+
 }
