@@ -121,6 +121,9 @@ J’ai utilisé :
 - La bibliothèque **JPBC** pour les opérations sur les courbes bilinéaires,
 - **BouncyCastle** pour certaines extensions cryptographiques si nécessaire.
 
+- Exemple de diagram de génération des clés : 
+![ScreenShot](./assets/protocoleAbe.png)
+
 ---
 
 ###  3. Interface en ligne de commande (CLI)
@@ -155,6 +158,12 @@ Enfin, j’ai développé une **interface utilisateur graphique** en React.js :
   - Déchiffrer un message si la politique est satisfaite.
 
 Cela permet à l’utilisateur non technique d’interagir simplement avec un système cryptographique avancé.
+
+Exemple de la vue utilisateur : 
+![ScreenShot](./assets/UserView.png)
+
+Exemple de la vue admin : 
+![ScreenShot](./assets/adminView.png)
 
 ---
 
