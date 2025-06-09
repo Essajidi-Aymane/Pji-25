@@ -1,3 +1,4 @@
+
 package com.example.abe.server;
 import com.example.abe.model.CipherText;
 import com.example.abe.model.PreCiphertext;
@@ -17,49 +18,40 @@ public class ServerEncryptor {
         this.pairing = pairing;
     }
 
-    public CipherText outEncrypt(PreCiphertext preCT, Map<String, Element[]> up) {
-        Element C0 = preCT.C0;
-        String encMsg = preCT.encryptedMsg;
-        String policy = preCT.policy;
-        Element[] C1Wrapper = new Element[]{ pairing.getGT().newOneElement().getImmutable() };
 
 
-        Map<String, Element> policyComponents = new HashMap<>();
+public CipherText outEncrypt(PreCiphertext preCT, Map<String, Element[]> up) {
 
-        AccessTreeNode root = AccessPolicyParser.parse(policy);
-        applyTreeEncryption(root, up, C0, policyComponents, C1Wrapper);
-        Element C1 = C1Wrapper[0];
-        return new CipherText(C0, C1, encMsg, policyComponents, policy );
-    }
-    private void applyTreeEncryption(
-            AccessTreeNode node,
-            Map<String, Element[]> up,
-            Element C0,
-            Map<String, Element> policyComponents,
-            Element[] C1Wrapper
-    ) {
-        if (node == null) return;
+    // Parcours récursif de l'arbre pour construire C_i et C_i′
+    traverse(preCT.root, up);
 
-        if (node.isLeaf()) {
-            String attr = node.attr;
-            if (up.containsKey(attr)) {
-                Element[] upAttr = up.get(attr);
 
-                // Contribution au C1
-                Element partial = pairing.pairing(C0, upAttr[0]).getImmutable();
-                C1Wrapper[0] = C1Wrapper[0].mul(partial).getImmutable();
+    return new CipherText(preCT.C, preCT.encryptedMsg, preCT.root);
+}
+private void traverse(AccessTreeNode node, Map<String, Element[]> up) {
+    if (node.isLeaf()) {
+        String attr = node.attr;
 
-                Element hashed = pairing.getG1().newElement().setFromHash(attr.getBytes(), 0, attr.length()).getImmutable();
-                Element comp = hashed.powZn(pairing.getZr().newRandomElement()).getImmutable();
-                policyComponents.put(attr, comp);
-            }
-        } else {
-            applyTreeEncryption(node.left, up, C0, policyComponents, C1Wrapper);
-            applyTreeEncryption(node.right, up, C0, policyComponents, C1Wrapper);
+        Element[] upPair = up.get(attr);
+        if (upPair == null) {
+            throw new IllegalArgumentException("Clé publique manquante pour l'attribut : " + attr);
         }
-    }
 
+        Element up1 = upPair[0];
+        Element up2 = upPair[1];
+
+        node.C= up1.powZn(node.preC).getImmutable();
+
+        // C_i′ = up2^lambda
+        node.C_prime= up2.powZn(node.preC).getImmutable();
+
+       
+    } else {
+        traverse(node.left,  up);
+        traverse(node.right, up);
+    }
+}
 
 }
 
-
+     

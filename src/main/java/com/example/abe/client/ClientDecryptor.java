@@ -8,13 +8,23 @@ import java.util.Base64;
 
 public class ClientDecryptor {
 
+    private Element lastK ; 
 
-    public String finalDecrypt(TransformedCT trasnct , Element dk ) {
+    public Element getlastK() {
+        return lastK;
+    }
+
+    
+
+    public Element finalDecrypt(TransformedCT trasnct , Element dk ) {
 
         Element K = trasnct.transformedC1.powZn(dk).getImmutable() ;
 
+
         byte[] hash = hashElement(K) ;
-        return xorDecrypt(trasnct.encMsg,hash);
+        lastK = K; 
+
+        return lastK;
     }
 
     private byte[] hashElement(Element e) {
@@ -32,6 +42,11 @@ public class ClientDecryptor {
             result[i] = (byte) (enc[i] ^ hash[i % hash.length]);
         }
         return new String(result, StandardCharsets.UTF_8);
+    }
+
+    public Element getLastK() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'getLastK'");
     }
 
 }

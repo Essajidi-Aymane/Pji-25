@@ -1,8 +1,11 @@
 package com.example.abe.client;
 
+import java.io.FileInputStream;
+import java.io.ObjectInputStream;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 
+import com.example.abe.crypto.PublicKey;
 import com.example.abe.model.PreCiphertext;
 import com.example.abe.parser.AccessPolicyParser;
 import com.example.abe.parser.AccessTreeNode;
@@ -10,44 +13,49 @@ import it.unisa.dia.gas.jpbc.Element;
 
 import it.unisa.dia.gas.jpbc.Field;
 import it.unisa.dia.gas.jpbc.Pairing;
+import it.unisa.dia.gas.plaf.jpbc.pairing.PairingFactory;
+
 import java.util.Base64;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 
 public class ClientEncryptor {
-    private final Pairing pairing ; 
+    private final Pairing pairing ;
+    private Element K ; 
 
     public ClientEncryptor(Pairing pairing) { 
         this.pairing= pairing ; 
     }
 
-    public PreCiphertext preEncrypt(String msg, String policy, Element ek, Map<String, Element[]> ukMap) {
+
+    public PreCiphertext preEncrypt(String msg, String policy, Element ek ){
         Field Zp = pairing.getZr();
         Element s = Zp.newRandomElement().getImmutable();
 
-        String attr = extractFirstAttr(policy);
-        Element[] up = ukMap.get(attr);
-
-        if (up == null) {
-            throw new IllegalArgumentException("Missing UK for attribute: " + attr);
+        AccessTreeNode treeNode = AccessPolicyParser.parse(policy, s , ek, Zp );
+      
+        PublicKey pb = null;
+        try (ObjectInputStream in = new ObjectInputStream(new FileInputStream("pb.key"))) {
+            pb = (PublicKey) in.readObject();
+            System.out.println("Clé publique chargée depuis pb.key");
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-
-        // C0 = up1^s
-        Element C0 = up[0].powZn(s).getImmutable();
-
-        Field G1 = pairing.getG1();
-       
-        Element sek = ek.powZn(s).getImmutable();  
-        Element K = pairing.pairing(pairing.getG1().newElement().setToOne(), pairing.getG1().newElement().setToOne())
-                .powZn(sek).getImmutable();
-
-        byte[] hashedK = hashElement(K);
-        String encrypted = xorWithHash(msg, hashedK);
-
-        return new PreCiphertext(C0, encrypted, policy);
+        Element C = pb.getH(pairing).powZn(s);
+        K= pb.getE_gg_alpha(pairing).powZn(s); 
+        return new PreCiphertext(C, policy, treeNode);
+      
     }
 
-    private String extractFirstAttr(String policy) {
+
+    public Element  getLastK() {
+        return this.K;
+
+    }
+
+ /*    private String extractFirstAttr(String policy) {
         AccessTreeNode root = AccessPolicyParser.parse(policy);
         return getFirstAttribute(root);
     }
@@ -73,5 +81,13 @@ public class ClientEncryptor {
         return Base64.getEncoder().encodeToString(result);
     }
 
-
+       private Element H2(String input, Field zp) {
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            byte[] hash = digest.digest(input.getBytes());
+            return zp.newElement().setFromHash(hash, 0, hash.length).getImmutable();
+        } catch (Exception e) {
+            throw new RuntimeException("Erreur dans H2 : " + e.getMessage());
+        }
+    } */
 }
