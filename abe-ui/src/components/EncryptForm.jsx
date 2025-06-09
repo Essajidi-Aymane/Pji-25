@@ -20,40 +20,55 @@ const buttonBase = "transition duration-300 delay-100 ease-in-out transform hove
 
 const handleEncrypt = async () => {
   if (!keys?.UK || !keys?.EK) {
-    alert("Clés manquantes !");
+    alert("Clés EK/UK manquantes !");
     return;
   }
 
-  const attrList = userAttrs.split(',').map(a => a.trim()).filter(Boolean);
+  let ukParsed;
+  try {
+    ukParsed = typeof keys.UK === 'string' ? JSON.parse(keys.UK) : keys.UK;
+  } catch (e) {
+    alert("Erreur: le champ UK n'est pas un JSON valide.");
+    return;
+  }
 
-  const preReq = {
-    message: msg,
-    policy,
-    ek: keys.EK,
-    uk: keys.UK
-  };
+  try {
+    const preReq = {
+      message: msg,
+      policy,
+      ek: keys.EK,
+      uk: ukParsed
+    };
 
-  const preRes = await fetch('/api/client/encrypt', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(preReq)
-  });
+    const preRes = await fetch('/api/client/encrypt', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(preReq)
+    });
 
-  const preCipher = await preRes.text();
+    if (!preRes.ok) throw new Error("Erreur dans /client/encrypt");
+    const preCipher = await preRes.text();
 
-  const encRes = await fetch('/api/encrypt', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      preCt: preCipher,
-      ukJson: keys.UK
-    })
-  });
+    const encRes = await fetch('/api/encrypt', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        preCt: preCipher,
+        ukJson: ukParsed
+      })
+    });
 
-  const fullCipher = await encRes.text();
-  setResult(fullCipher);
-  setCipher(fullCipher);
+    if (!encRes.ok) throw new Error("Erreur dans /encrypt");
+    const fullCipher = await encRes.text();
+
+    setResult(fullCipher);
+    setCipher(fullCipher);
+  } catch (err) {
+    console.error("Erreur handleEncrypt:", err);
+    alert("Erreur lors du chiffrement : " + err.message);
+  }
 };
+
 const handleFinalDecrypt = async () => {
   const res = await axios.post('/api/client/decrypt', {
     transformedCt: JSON.stringify(decrypted),  
@@ -65,23 +80,35 @@ const handleFinalDecrypt = async () => {
 
 
 const handleDecrypt = async () => {
-  if (!keys?.TK) {
-    alert("Clé TK manquante !");
+  if (!keys?.TK || !keys?.D) {
+    alert("Clés TK ou D manquantes !");
     return;
   }
 
-  const tkArray = Object.values(keys.TK).flat();
-  const tkEncoded = JsonUtil.encodeElementArray(tkArray);
+  let tkParsed;
+  try {
+    tkParsed = typeof keys.TK === 'string' ? JSON.parse(keys.TK) : keys.TK;
+  } catch (e) {
+    alert("Erreur: le champ TK n'est pas un JSON valide.");
+    return;
+  }
 
-  const decryptReq = {
-    cipherTextJson: cipher,
-    tkJson: tkEncoded,
-    attrs: userAttrs.split(',').map(a => a.trim())
-  };
+  try {
+    const decryptReq = {
+      cipherTextJson: cipher,
+      tkJson: tkParsed,
+      attrs: userAttrs.split(',').map(a => a.trim()),
+      D: keys.D
+    };
 
-  const res = await axios.post('/api/decrypt', decryptReq);
-  setDecrypted(res.data);  
+    const res = await axios.post('/api/decrypt', decryptReq);
+    setDecrypted(res.data); 
+  } catch (err) {
+    console.error("Erreur handleDecrypt:", err);
+    alert("Erreur de transformation serveur : " + err.message);
+  }
 };
+
 
 
   const handleKeygen = async () => {

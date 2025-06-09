@@ -1,13 +1,18 @@
 package com.example.abe.backend;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+
 
 public class DecryptRequest {
     private String cipherTextJson;
-    public  List<String> tkJson;
-    private List<String> attrs; // attributs
+    private Map<String, List<String>> tkJson;
+    private Set<String> attrs; // attributs
+    private String d; 
 
-    public List<String> getAttrs() {
+    public Set<String> getAttrs() {
         return attrs;
     }
 
@@ -15,11 +20,11 @@ public class DecryptRequest {
         return cipherTextJson;
     }
 
-    public List<String> getTkJson() {
-        return tkJson;
-    }
+   public Map<String, List<String>> getTkJson() {
+       return tkJson;
+   }
 
-    public void setAttrs(List<String> attrs) {
+    public void setAttrs(Set<String> attrs) {
         this.attrs = attrs;
     }
 
@@ -27,7 +32,11 @@ public class DecryptRequest {
         this.cipherTextJson = cipherTextJson;
     }
 
-    public void setTkJson(List<String> tkJson) {
+    public void setTkJson(Map<String, List<String>> tkJson) {
         this.tkJson = tkJson;
     }
+
+   public String getD() {
+       return d;
+   }
 }

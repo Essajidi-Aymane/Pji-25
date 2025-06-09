@@ -2,12 +2,10 @@
 package com.example.abe.server;
 import com.example.abe.model.CipherText;
 import com.example.abe.model.PreCiphertext;
-import com.example.abe.parser.AccessPolicyParser;
 import com.example.abe.parser.AccessTreeNode;
 import it.unisa.dia.gas.jpbc.Element;
 import it.unisa.dia.gas.jpbc.Pairing;
 
-import java.util.HashMap;
 import java.util.Map;
 public class ServerEncryptor {
 

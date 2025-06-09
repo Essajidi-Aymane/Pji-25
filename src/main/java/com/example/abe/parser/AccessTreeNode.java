@@ -7,12 +7,11 @@ public class AccessTreeNode {
     public String operator; 
     public AccessTreeNode left;
     public AccessTreeNode right;
-
-    public Element lambda; 
-    public Element preC;      
-    public Element C; 
-    public Element C_prime; 
-    public int     xIndex;  
+    public transient Element lambda; 
+    public transient Element preC;      
+    public transient Element C; 
+    public transient Element C_prime; 
+    public transient int xIndex;
 
     public boolean isLeaf() {
         return operator == null;

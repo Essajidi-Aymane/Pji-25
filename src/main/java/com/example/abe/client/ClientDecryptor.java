@@ -1,6 +1,7 @@
 package com.example.abe.client;
 import com.example.abe.model.TransformedCT;
 import it.unisa.dia.gas.jpbc.Element;
+import it.unisa.dia.gas.jpbc.Pairing;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
@@ -8,23 +9,21 @@ import java.util.Base64;
 
 public class ClientDecryptor {
 
-    private Element lastK ; 
+    private Pairing pairing;
 
-    public Element getlastK() {
-        return lastK;
+    public ClientDecryptor(Pairing pairing) {
+        this.pairing= pairing;
     }
 
-    
-
-    public Element finalDecrypt(TransformedCT trasnct , Element dk ) {
+    public String finalDecrypt(TransformedCT trasnct , Element dk ) {
 
         Element K = trasnct.transformedC1.powZn(dk).getImmutable() ;
 
 
         byte[] hash = hashElement(K) ;
-        lastK = K; 
+       
 
-        return lastK;
+        return xorDecrypt(trasnct.encMsg, hash) ;
     }
 
     private byte[] hashElement(Element e) {
@@ -44,9 +43,6 @@ public class ClientDecryptor {
         return new String(result, StandardCharsets.UTF_8);
     }
 
-    public Element getLastK() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getLastK'");
-    }
+   
 
 }
