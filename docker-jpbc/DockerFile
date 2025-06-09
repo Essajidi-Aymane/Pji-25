@@ -1,0 +1,21 @@
+# Étape 1 : Builder Maven + Java 17
+FROM maven:3.9.6-eclipse-temurin-17 as builder
+WORKDIR /app
+
+# Copier le projet
+COPY abe-project /app
+
+# Copier les .jar JPBC localement et les installer dans le repo Maven local
+COPY jpbc-lib /tmp/jpbc-lib
+RUN mvn install:install-file -Dfile=/tmp/jpbc-lib/jpbc-api-2.0.0.jar -DgroupId=it.unisa.dia.gas -DartifactId=jpbc-api -Dversion=2.0.0 -Dpackaging=jar && \
+    mvn install:install-file -Dfile=/tmp/jpbc-lib/jpbc-plaf-2.0.0.jar -DgroupId=it.unisa.dia.gas -DartifactId=jpbc-plaf -Dversion=2.0.0 -Dpackaging=jar
+
+# Construire l'application Spring Boot
+RUN mvn clean package -DskipTests
+
+# Étape 2 : Image exécutable
+FROM eclipse-temurin:17-jdk
+WORKDIR /app
+COPY --from=builder /app/target/*.jar app.jar
+
+ENTRYPOINT ["java", "-jar", "app.jar"]

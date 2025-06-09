@@ -5,6 +5,8 @@ import axios from 'axios';
    const [input, setInput] = useState('');
    const [log, setLog] = useState('');
 
+    const buttonBase = "transition duration-300 delay-100 ease-in-out transform hover:scale-105 hover:shadow-md";
+
    const fetchAttrs = async () => {
      const res = await fetch('/api/attrs');
      const data = await res.json();
@@ -34,11 +36,14 @@ import axios from 'axios';
    };
 
    return (
-     <div className="p-6 bg-white rounded shadow">
+     <div className="flex flex-col gap-1 p-6 bg-white rounded shadow">
+      <div>
        <h2 className="text-xl font-bold mb-2">Panneau d'administration</h2>
-       <button onClick={handleSetup} className="bg-blue-500 text-white px-4 py-1 rounded mr-2">
+       <button onClick={handleSetup} className={`bg-blue-500 text-white px-4 py-1 rounded mr-2 ${buttonBase}`}>
          Initialiser le système
        </button>
+
+      </div>
        <div className="my-3">
          <input
            value={input}
@@ -46,11 +51,15 @@ import axios from 'axios';
            placeholder="ex: student,prof,iot"
            className="border p-2 w-full"
          />
-         <button onClick={handleDefineAttrs} className="mt-2 bg-green-600 text-white px-4 py-1 rounded">
+       
+       </div>
+       <div>
+
+         <button onClick={handleDefineAttrs} className={` bg-green-600 text-white px-4 py-1 rounded ${buttonBase}`}>
            Définir les attributs
          </button>
        </div>
-       <p className="text-sm text-gray-600">Actuellement : {attrs.join(', ')}</p>
+       <p className="mt-2 text-sm text-gray-600">Actuellement : {attrs.join(', ')}</p>
        <p className="mt-2 text-blue-700 font-semibold">{log}</p>
      </div>
    );

@@ -11,6 +11,7 @@ export default function EncryptForm() {
   const [cipher, setCipher] = useState(''); 
   const [decrypted, setDecrypted] = useState(''); 
 const [finaleMsg, setFinaleMsg] = useState('');
+const buttonBase = "transition duration-300 delay-100 ease-in-out transform hover:scale-105 hover:shadow-md";
   useEffect(() => {
     fetch('/api/attrs')
       .then(r => r.json())
@@ -143,20 +144,20 @@ console.log("Clés reçues :", res.data);
       <div className="flex flex-wrap justify-center gap-4 mb-6">
         <button
           onClick={handleKeygen}
-          className="bg-gray-700 text-white px-4 py-2 rounded"
+          className={`bg-gray-700 text-white px-4 py-2 rounded ${buttonBase}`}
         >
           Générer mes clés
         </button>
         <button
           onClick={handleEncrypt}
-          className="bg-purple-600 text-white px-4 py-2 rounded"
+          className= {`bg-purple-600 text-white px-4 py-2 rounded ${buttonBase}`}
           disabled={!keys}
         >
           Chiffrer
         </button>
         <button
           onClick={handleDecrypt}
-          className="bg-blue-600 text-white px-4 py-2 rounded"
+          className={`bg-blue-600 text-white px-4 py-2 rounded ${buttonBase}`}
           disabled={!cipher}
         >
           Déchiffrer
@@ -179,7 +180,7 @@ console.log("Clés reçues :", res.data);
             onClick={handleFinalDecrypt}
             className="bg-green-600 text-white mt-2 px-4 py-1 rounded"
           >
-            🔓 Déchiffrement final
+            Déchiffrement final
           </button>
         </div>
       )}
