@@ -51,8 +51,8 @@ public class EndToEndTest {
         System.out.println("Clé K (enc) : " + clientEnc.getLastK());  
         System.out.println("Clé K (dec) : " + k);
         System.out.println(clientEnc.getLastK().isEqual(k)
-                ? "✅  K identiques"
-                : "❌  K mismatch");
+                ? "  K identiques"
+                : "  K mismatch");
 
                 System.out.println(clientEnc.getLastK().getField());
                 System.out.println(k.getField());
