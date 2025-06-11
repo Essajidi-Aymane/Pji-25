@@ -1,6 +1,7 @@
 package com.example.abe.model;
 
 import com.example.abe.parser.AccessTreeNode;
+import com.example.abe.parser.SerializableAccessTreeNode;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import it.unisa.dia.gas.jpbc.Element;
@@ -31,15 +32,54 @@ public class PreCiphertext {
                 "policy=" + new Gson().toJson(root) + "\n}";
     }
 
-    public String toJson() {
+    public String toJson() { 
+        root.prepareForSerialization();
+SerializableAccessTreeNode serialRoot = root.toSerializable();
+
+Map<String, Object> map = new HashMap<>();
+map.put("C", Base64.getEncoder().encodeToString(C.toBytes()));
+map.put("encryptedMsg", encryptedMsg);
+map.put("root", serialRoot);
+
+return new Gson().toJson(map);  
+
+    }
+    /* public String toJson() {
         Map<String, String> map = new HashMap<>();
         map.put("C", Base64.getEncoder().encodeToString(C.toBytes()));
         map.put("encryptedMsg", encryptedMsg);
         map.put("root", new Gson().toJson(root));  
         return new Gson().toJson(map);
-    }
+    } */
+
 
     public static PreCiphertext fromJson(String json, Pairing pairing) {
+    Gson gson = new Gson();
+    Type mapType = new TypeToken<Map<String, Object>>() {}.getType();
+    Map<String, Object> map = gson.fromJson(json, mapType);
+
+    // Extraire C
+    String cBase64 = (String) map.get("C");
+    Element C = pairing.getG1()
+        .newElementFromBytes(Base64.getDecoder().decode(cBase64))
+        .getImmutable();
+
+    // Message chiffré
+    String encryptedMsg = (String) map.get("encryptedMsg");
+
+    // Root (en tant que structure DTO)
+    SerializableAccessTreeNode serialRoot = gson.fromJson(
+        gson.toJson(map.get("root")),
+        SerializableAccessTreeNode.class
+    );
+
+    // Reconstruction de l'arbre complet avec les preC
+    AccessTreeNode root = AccessTreeNode.fromSerializable(serialRoot, pairing);
+
+    return new PreCiphertext(C, encryptedMsg, root);
+}
+
+/*     public static PreCiphertext fromJson(String json, Pairing pairing) {
         Gson gson = new Gson();
         Type mapType = new TypeToken<Map<String, String>>(){}.getType();
         Map<String, String> map = gson.fromJson(json, mapType);
@@ -50,5 +90,5 @@ public class PreCiphertext {
         AccessTreeNode root = gson.fromJson(map.get("root"), AccessTreeNode.class);
 
         return new PreCiphertext(C, encryptedMsg, root);
-    }
+    } */
 }

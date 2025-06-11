@@ -26,7 +26,7 @@ public CipherText outEncrypt(PreCiphertext preCT, Map<String, Element[]> up) {
 
     return new CipherText(preCT.C, preCT.encryptedMsg, preCT.root);
 }
-private void traverse(AccessTreeNode node, Map<String, Element[]> up) {
+/*private void traverse(AccessTreeNode node, Map<String, Element[]> up) {
     if (node.isLeaf()) {
         String attr = node.attr;
 
@@ -48,8 +48,29 @@ private void traverse(AccessTreeNode node, Map<String, Element[]> up) {
         traverse(node.left,  up);
         traverse(node.right, up);
     }
+}*/
+
+private void traverse(AccessTreeNode node, Map<String, Element[]> up) {
+    if (node.isLeaf()) {
+        String attr = node.attr;
+
+        Element[] upPair = up.get(attr);
+      
+        Element up1 = upPair[0];
+        Element up2 = upPair[1];
+System.out.println(" Attribut = " + node.attr);
+System.out.println("    up1 null ? " + (up1 == null));
+System.out.println("    up2 null ? " + (up2 == null));
+
+        node.C = upPair[0].powZn(node.preC).getImmutable();
+        node.C_prime = upPair[1].powZn(node.preC).getImmutable();
+
+    } else {
+        if (node.left != null) traverse(node.left, up);
+        if (node.right != null) traverse(node.right, up);
+    }
 }
 
-}
 
-     
+
+}

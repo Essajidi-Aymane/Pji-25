@@ -8,10 +8,13 @@ export default function EncryptForm() {
   const [userAttrs, setUserAttrs] = useState('');
   const [result, setResult] = useState('');
   const [keys,setKeys] = useState(null);
-  const [cipher, setCipher] = useState(''); 
+  const [ cipher, setCipher] = useState(''); 
   const [decrypted, setDecrypted] = useState(''); 
 const [finaleMsg, setFinaleMsg] = useState('');
 const buttonBase = "transition duration-300 delay-100 ease-in-out transform hover:scale-105 hover:shadow-md";
+
+
+
   useEffect(() => {
     fetch('/api/attrs')
       .then(r => r.json())
@@ -32,6 +35,23 @@ const handleEncrypt = async () => {
     return;
   }
 
+  const extractAttributesFromPolicy = (policy) => {
+    return policy
+      .replace(/[\(\)]/g, '')
+      .split(/\bAND\b|\bOR\b/i)
+      .map(attr => attr.trim())
+      .filter(Boolean);
+  };
+
+  const policyAttrs = extractAttributesFromPolicy(policy);
+
+  for (const attr of policyAttrs) {
+    if (!ukParsed[attr] || ukParsed[attr].length < 2) {
+      alert(`Attribut "${attr}" manquant ou incomplet dans UK`);
+      return;
+    }
+  }
+
   try {
     const preReq = {
       message: msg,
@@ -49,6 +69,12 @@ const handleEncrypt = async () => {
     if (!preRes.ok) throw new Error("Erreur dans /client/encrypt");
     const preCipher = await preRes.text();
 
+
+console.log("UK ENVOYÉ :", ukParsed);
+console.log("EK :", keys.EK);
+console.log("Attributs dans la politique :", extractAttributesFromPolicy(policy));
+
+
     const encRes = await fetch('/api/encrypt', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -58,7 +84,10 @@ const handleEncrypt = async () => {
       })
     });
 
-    if (!encRes.ok) throw new Error("Erreur dans /encrypt");
+    if (!encRes.ok) {
+  const errorText = await encRes.text();
+  throw new Error("Erreur dans /encrypt : " + errorText);
+}
     const fullCipher = await encRes.text();
 
     setResult(fullCipher);
@@ -68,6 +97,7 @@ const handleEncrypt = async () => {
     alert("Erreur lors du chiffrement : " + err.message);
   }
 };
+
 
 const handleFinalDecrypt = async () => {
   const res = await axios.post('/api/client/decrypt', {
@@ -124,6 +154,16 @@ const handleDecrypt = async () => {
 console.log("Clés reçues :", res.data);
   setKeys(res.data);
   };
+  
+
+  const renderPolicyText = (node) => {
+  if (!node) return '';
+  if (node.attr) return node.attr;
+  const left = renderPolicyText(node.left);
+  const right = renderPolicyText(node.right);
+  return `(${left} ${node.operator} ${right})`;
+};
+
 
  return (
     <div className="p-6 bg-white rounded shadow mt-4">
@@ -194,8 +234,10 @@ console.log("Clés reçues :", res.data);
 {cipher && (
   <div className=" bg-gray-100  mt-4 text-sm break-words rounded p-4">
     <h3 className="font-semibold text-purple-700 mb-2"> Chiffrement</h3>
-    <p><strong>Message chiffré :</strong> {JSON.parse(cipher).encMsg}</p>
-    <p><strong>Politique :</strong> {JSON.parse(cipher).policy}</p>
+    <p><strong>Message chiffré (base64) :</strong></p>
+    <pre className="text-xs bg-white p-2 border rounded overflow-x-auto">
+      {JSON.parse(cipher).encMsg}
+    </pre><p><strong>Politique :</strong> {renderPolicyText(JSON.parse(cipher).policy)}</p>
   </div>
 )}
 

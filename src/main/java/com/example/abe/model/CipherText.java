@@ -1,12 +1,12 @@
 package com.example.abe.model;
 
 import com.example.abe.parser.AccessTreeNode;
+import com.example.abe.parser.SerializableAccessTreeNode;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import it.unisa.dia.gas.jpbc.Element;
 import it.unisa.dia.gas.jpbc.Pairing;
 
-import java.io.Serializable;
 import java.lang.reflect.Type;
 import java.util.Base64;
 import java.util.HashMap;
@@ -33,16 +33,29 @@ public class CipherText  {
                 "\n}";
     }
 
-    public String toJson() {
+    /* public String toJson() {
         Gson gson = new Gson();
         Map<String, String> data = new HashMap<>();
         data.put("C0", Base64.getEncoder().encodeToString(C0.toBytes()));
         data.put("encMsg", encMsg);
         data.put("policy", gson.toJson(policy));
         return gson.toJson(data);
-    }
+    } */
 
-    public static CipherText fromJson(String json, Pairing pairing) {
+
+    public String toJson() {
+    Gson gson = new Gson();
+    Map<String, Object> data = new HashMap<>();
+    data.put("C0", Base64.getEncoder().encodeToString(C0.toBytes()));
+    data.put("encMsg", encMsg);
+
+    policy.prepareForSerialization();
+    data.put("policy", policy.toSerializable());
+
+    return gson.toJson(data);
+}
+
+   /*  public static CipherText fromJson(String json, Pairing pairing) {
         Gson gson = new Gson();
         Type mapType = new TypeToken<Map<String, String>>() {}.getType();
         Map<String, String> data = gson.fromJson(json, mapType);
@@ -56,5 +69,26 @@ public class CipherText  {
         AccessTreeNode policy = gson.fromJson(data.get("policy"), AccessTreeNode.class);
 
         return new CipherText(C0, encMsg, policy);
-    }
+    } */
+   public static CipherText fromJson(String json, Pairing pairing) {
+    Gson gson = new Gson();
+    Type mapType = new TypeToken<Map<String, Object>>() {}.getType();
+    Map<String, Object> data = gson.fromJson(json, mapType);
+
+    Element C0 = pairing.getG1()
+            .newElementFromBytes(Base64.getDecoder().decode((String) data.get("C0")))
+            .getImmutable();
+
+    String encMsg = (String) data.get("encMsg");
+
+    SerializableAccessTreeNode sNode = gson.fromJson(
+        gson.toJson(data.get("policy")),
+        SerializableAccessTreeNode.class
+    );
+
+    AccessTreeNode policy = AccessTreeNode.fromSerializable(sNode, pairing);
+
+    return new CipherText(C0, encMsg, policy);
+}
+
 }

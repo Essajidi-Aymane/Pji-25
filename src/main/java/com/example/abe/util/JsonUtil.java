@@ -25,7 +25,7 @@ public static Element[] decodeElementArray(List<String> list, Pairing pairing) {
         for (Map.Entry<String, Element[]> entry : map.entrySet()) {
             List<String> list = new ArrayList<>();
             for (Element e : entry.getValue()) {
-                list.add(Base64.getEncoder().encodeToString(e.toBytes()));
+                list.add(Base64.getEncoder().encodeToString(e.duplicate().toBytes()));
             }
             base64Map.put(entry.getKey(), list);
         }
@@ -51,20 +51,54 @@ public static Element[] decodeElementArray(List<String> list, Pairing pairing) {
         map.put("ukJson", encodeElementArrayMap(uk));
         return new Gson().toJson(map);
     }
-    
-public static Map<String, Element[]> decodeElementArrayMap(Map<String, List<String>> input, Pairing pairing) {
+    public static Map<String, Element[]> decodeElementArrayMap(Map<String, List<String>> input, Pairing pairing) {
     Map<String, Element[]> result = new HashMap<>();
+
     for (Map.Entry<String, List<String>> entry : input.entrySet()) {
+        String attr = entry.getKey();
         List<String> encodedElements = entry.getValue();
+
+        // Validation structurelle
+        if (encodedElements == null || encodedElements.size() < 2) {
+            System.err.println(" Clé manquante ou incomplète pour l'attribut : " + attr);
+            throw new IllegalArgumentException("Clé incomplète pour l'attribut : " + attr);
+        }
+
         Element[] elements = new Element[encodedElements.size()];
         for (int i = 0; i < encodedElements.size(); i++) {
-            elements[i] = pairing.getG1()
-                .newElementFromBytes(Base64.getDecoder().decode(encodedElements.get(i)))
-                .getImmutable();
+            try {
+                String b64 = encodedElements.get(i);
+                if (b64 == null || b64.isBlank()) {
+                    System.err.println(" Chaîne base64 vide pour l'attribut : " + attr + " à l'index " + i);
+                    throw new IllegalArgumentException("Chaîne vide dans UK pour : " + attr);
+                }
+                System.out.println("🔍 Début décodage de " + attr + "[" + i + "]");
+                System.out.println("    Base64 = " + b64);
+
+
+                
+                elements[i] = pairing.getG1().newElementFromBytes(Base64.getDecoder().decode(b64)).getImmutable();
+                System.out.println("    Bytes → Element OK = " + (elements[i] != null));
+
+
+                if (elements[i] == null) {
+    System.err.println(" newElementFromBytes a retourné NULL pour " + attr + "[" + i + "]");
+    throw new IllegalArgumentException("Reconstruction échouée pour " + attr);
+}
+
+
+            } catch (Exception e) {
+                System.err.println(" Erreur de décodage base64 pour l'attribut : " + attr + " à l'index " + i);
+                e.printStackTrace();
+                throw new RuntimeException("Erreur de décodage UK[" + attr + "][" + i + "]", e);
+            }
         }
-        result.put(entry.getKey(), elements);
+
+        result.put(attr, elements);
     }
+
     return result;
 }
+
 
 }
