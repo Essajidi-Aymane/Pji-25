@@ -5,7 +5,7 @@
 - **Étudiant :** Aymane Essajidi  
 - **Email :** aymane.essajidi.etu@univ-lille.fr  
 - **Encadrant :** Hassan Elgafif  
-- **Email :** hassan.elgafif@gmail.com  
+- **Email :** hassan.elgafif@gmail.com (hassan.elgafif@edu.uiz.ac.ma)
 - **Titre :** Externalisation sécurisée du chiffrement basé sur les attributs (ABE) via un webservice cloud
 
 - **git :** https://github.com/Essajidi-Aymane/Pji-25.git
@@ -122,6 +122,7 @@ J’ai utilisé :
 - **BouncyCastle** pour certaines extensions cryptographiques si nécessaire.
 
 - Exemple de diagram de génération des clés : 
+
 ![ScreenShot](./assets/protocoleAbe.png)
 
 ---
