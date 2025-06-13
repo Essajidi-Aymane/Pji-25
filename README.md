@@ -136,6 +136,10 @@ Avant toute interface graphique, j’ai développé une interface **en ligne de 
 
 Cette étape a été essentielle pour m'assurer que l’implémentation respectait le comportement attendu.
 
+Exemple d'execution en utilisant l'interface en ligne de commande : 
+
+![ScreenShot](./assets/abecliDemo.png)
+
 ---
 
 ###  4. Création du backend web (Spring Boot)
