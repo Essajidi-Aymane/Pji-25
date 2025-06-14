@@ -31,7 +31,7 @@ public class UserKeys {
 
         // Encode UK et TK
         data.put("UK", gson.toJson(encodeMapOfElements(UK)));
-        data.put("TK", gson.toJson(encodeMapOfElements(TK.getTkMap())));
+        data.put("TK", this.TK.toJson());
 
         return gson.toJson(data);
     }
@@ -52,19 +52,20 @@ public class UserKeys {
         Gson gson = new Gson();
         Type mapType = new TypeToken<Map<String, String>>() {}.getType();
         Map<String, String> raw = gson.fromJson(json, mapType);
+        TK tk = new TK();
+        Element ek = pairing.getZr().newElementFromBytes(Base64.getDecoder().decode(raw.get("EK"))).getImmutable();
+        Element dk = pairing.getZr().newElementFromBytes(Base64.getDecoder().decode(raw.get("DK"))).getImmutable();
+        String tkRaw = raw.get("TK");
 
-        Element ek = pairing.getG1().newElementFromBytes(Base64.getDecoder().decode(raw.get("EK"))).getImmutable();
-        Element dk = pairing.getG1().newElementFromBytes(Base64.getDecoder().decode(raw.get("DK"))).getImmutable();
-        Element d = pairing.getG1().newElementFromBytes(Base64.getDecoder().decode(raw.get("D"))).getImmutable();
+        
 
         Type mapArrayType = new TypeToken<Map<String, List<String>>>() {}.getType();
         Map<String, List<String>> ukRaw = gson.fromJson(raw.get("UK"), mapArrayType);
-        Map<String, List<String>> tkRaw = gson.fromJson(raw.get("TK"), mapArrayType);
 
         Map<String, Element[]> uk = decodeMapOfElements(ukRaw, pairing);
-         Map<String, Element[]> tkMap = decodeMapOfElements(tkRaw, pairing);
-
-        TK tk = new TK(d, tkMap);
+        
+        tk.fromJson(tkRaw,pairing);
+        
 
            return new UserKeys(ek, dk, tk, uk);
     }

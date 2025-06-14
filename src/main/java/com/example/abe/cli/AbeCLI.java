@@ -6,7 +6,6 @@ import com.example.abe.crypto.*;
 import com.example.abe.model.*;
 import com.example.abe.server.ServerEncryptor;
 import com.example.abe.server.ServerDecryptor;
-import it.unisa.dia.gas.jpbc.Element;
 import it.unisa.dia.gas.jpbc.Pairing;
 import it.unisa.dia.gas.plaf.jpbc.pairing.PairingFactory;
 

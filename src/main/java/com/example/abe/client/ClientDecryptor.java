@@ -10,6 +10,7 @@ import java.util.Base64;
 public class ClientDecryptor {
 
     private Pairing pairing;
+    private  Element k ; 
 
     public ClientDecryptor(Pairing pairing) {
         this.pairing= pairing;
@@ -19,11 +20,13 @@ public class ClientDecryptor {
 
         Element K = trasnct.transformedC1.powZn(dk).getImmutable() ;
 
-
         byte[] hash = hashElement(K) ;
        
-
+        this.k = K;
         return xorDecrypt(trasnct.encMsg, hash) ;
+    }
+    public Element getK() {
+        return k;
     }
 
     private byte[] hashElement(Element e) {

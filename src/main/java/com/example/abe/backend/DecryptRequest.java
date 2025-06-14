@@ -4,13 +4,18 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 
 
 public class DecryptRequest {
     private String cipherTextJson;
     private Map<String, List<String>> tkJson;
     private Set<String> attrs; // attributs
-    private String d; 
+    
+    
+    @JsonProperty("D")
+    private String D; 
 
     public Set<String> getAttrs() {
         return attrs;
@@ -37,6 +42,9 @@ public class DecryptRequest {
     }
 
    public String getD() {
-       return d;
+       return D;
+   }
+   public void setD(String D) {
+       this.D = D;
    }
 }

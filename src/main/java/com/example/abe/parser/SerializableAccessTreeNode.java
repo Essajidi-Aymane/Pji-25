@@ -5,6 +5,8 @@ public class SerializableAccessTreeNode {
     public String operator;
     public int xIndex;
     public String preC_b64;
+    public String C_b64;
+    public String C_prime_b64;
     public SerializableAccessTreeNode left;
     public SerializableAccessTreeNode right;
 }

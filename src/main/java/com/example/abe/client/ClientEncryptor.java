@@ -41,6 +41,7 @@ public class ClientEncryptor {
         }
         Element C = pb.getH(pairing).powZn(s);
         K= pb.getE_gg_alpha(pairing).powZn(s); 
+        System.out.println("la clé K : "+ K);
  byte[] hash = hashElement(K);
     byte[] msgBytes = msg.getBytes(StandardCharsets.UTF_8);
     byte[] xor = new byte[msgBytes.length];

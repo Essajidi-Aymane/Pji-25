@@ -33,27 +33,25 @@ public class CipherText  {
                 "\n}";
     }
 
-    /* public String toJson() {
+    /*public String toJson() {
         Gson gson = new Gson();
         Map<String, String> data = new HashMap<>();
         data.put("C0", Base64.getEncoder().encodeToString(C0.toBytes()));
         data.put("encMsg", encMsg);
         data.put("policy", gson.toJson(policy));
         return gson.toJson(data);
-    } */
+    }*/ 
 
-
-    public String toJson() {
+   public String toJson() {
     Gson gson = new Gson();
     Map<String, Object> data = new HashMap<>();
     data.put("C0", Base64.getEncoder().encodeToString(C0.toBytes()));
     data.put("encMsg", encMsg);
 
-    policy.prepareForSerialization();
     data.put("policy", policy.toSerializable());
 
     return gson.toJson(data);
-}
+} 
 
    /*  public static CipherText fromJson(String json, Pairing pairing) {
         Gson gson = new Gson();
@@ -70,7 +68,7 @@ public class CipherText  {
 
         return new CipherText(C0, encMsg, policy);
     } */
-   public static CipherText fromJson(String json, Pairing pairing) {
+  public static CipherText fromJson(String json, Pairing pairing) {
     Gson gson = new Gson();
     Type mapType = new TypeToken<Map<String, Object>>() {}.getType();
     Map<String, Object> data = gson.fromJson(json, mapType);
@@ -89,6 +87,6 @@ public class CipherText  {
     AccessTreeNode policy = AccessTreeNode.fromSerializable(sNode, pairing);
 
     return new CipherText(C0, encMsg, policy);
-}
+} 
 
 }

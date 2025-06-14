@@ -12,16 +12,7 @@ import it.unisa.dia.gas.plaf.jpbc.pairing.PairingFactory;
 
 public class AccessPolicyParser {
 
-    public static void main (String[] args) {
-        Pairing pairing = PairingFactory.getPairing("params/a.properties"); 
-        Field Zp = pairing.getZr();
 
-        Element s = Zp.newRandomElement().getImmutable();
-        Element ek = Zp.newRandomElement().getImmutable();
-        AccessTreeNode x = parse("((student AND iot) OR (student AND finance))",s , ek, Zp);
-        System.out.println("-------------------------");
-
-    }
 
     public static AccessTreeNode parse(String expr, Element s, Element ek, Field Zp) {
         expr = expr.trim();
@@ -62,6 +53,8 @@ public class AccessPolicyParser {
         if ("OR".equalsIgnoreCase(op)) {
             node.left = parse(leftExpr, s, ek, Zp);
             node.right = parse(rightExpr, s, ek, Zp);
+            node.left .xIndex = 1;   
+            node.right.xIndex = 2;
         } else if ("AND".equalsIgnoreCase(op)) {
             // f(x) = s + a·x (seuil 2 de Shamir)
             Element a = Zp.newRandomElement().getImmutable();

@@ -38,7 +38,6 @@ public class TA {
         } catch (Exception e) {
             e.printStackTrace();
         }
-         System.out.println(h);
 
         System.out.println("TA setup terminé");
     }

@@ -60,7 +60,6 @@ public static Element[] decodeElementArray(List<String> list, Pairing pairing) {
 
         // Validation structurelle
         if (encodedElements == null || encodedElements.size() < 2) {
-            System.err.println(" Clé manquante ou incomplète pour l'attribut : " + attr);
             throw new IllegalArgumentException("Clé incomplète pour l'attribut : " + attr);
         }
 
@@ -69,26 +68,20 @@ public static Element[] decodeElementArray(List<String> list, Pairing pairing) {
             try {
                 String b64 = encodedElements.get(i);
                 if (b64 == null || b64.isBlank()) {
-                    System.err.println(" Chaîne base64 vide pour l'attribut : " + attr + " à l'index " + i);
                     throw new IllegalArgumentException("Chaîne vide dans UK pour : " + attr);
                 }
-                System.out.println("🔍 Début décodage de " + attr + "[" + i + "]");
-                System.out.println("    Base64 = " + b64);
 
 
                 
                 elements[i] = pairing.getG1().newElementFromBytes(Base64.getDecoder().decode(b64)).getImmutable();
-                System.out.println("    Bytes → Element OK = " + (elements[i] != null));
 
 
                 if (elements[i] == null) {
-    System.err.println(" newElementFromBytes a retourné NULL pour " + attr + "[" + i + "]");
     throw new IllegalArgumentException("Reconstruction échouée pour " + attr);
 }
 
 
             } catch (Exception e) {
-                System.err.println(" Erreur de décodage base64 pour l'attribut : " + attr + " à l'index " + i);
                 e.printStackTrace();
                 throw new RuntimeException("Erreur de décodage UK[" + attr + "][" + i + "]", e);
             }

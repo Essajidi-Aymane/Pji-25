@@ -70,9 +70,7 @@ const handleEncrypt = async () => {
     const preCipher = await preRes.text();
 
 
-console.log("UK ENVOYÉ :", ukParsed);
-console.log("EK :", keys.EK);
-console.log("Attributs dans la politique :", extractAttributesFromPolicy(policy));
+
 
 
     const encRes = await fetch('/api/encrypt', {
@@ -104,8 +102,7 @@ const handleFinalDecrypt = async () => {
     transformedCt: JSON.stringify(decrypted),  
     dk: keys.DK
   });
-
-  alert("Message final déchiffré : " + res.data);
+setFinaleMsg(res.data);
 };
 
 
@@ -232,22 +229,22 @@ console.log("Clés reçues :", res.data);
       </div>
 
 {cipher && (
-  <div className=" bg-gray-100  mt-4 text-sm break-words rounded p-4">
+  <div className=" bg-gray-100 border-l-4 border-purple-500  mt-4 text-sm break-words overflow-auto  rounded p-4">
     <h3 className="font-semibold text-purple-700 mb-2"> Chiffrement</h3>
     <p><strong>Message chiffré (base64) :</strong></p>
-    <pre className="text-xs bg-white p-2 border rounded overflow-x-auto">
+    <pre className="text-xs bg-white p-2 border rounded overflow-x-auto whitespace-pre-wrap">
       {JSON.parse(cipher).encMsg}
     </pre><p><strong>Politique :</strong> {renderPolicyText(JSON.parse(cipher).policy)}</p>
   </div>
 )}
 
  {decrypted && (
-        <div className="bg-green-50 border-l-4 border-green-500 p-4 mt-4 rounded">
+        <div className="bg-green-50 border-l-4 border-green-500 p-4 mt-4 rounded break-words overflow-auto">
           <h3 className="font-semibold text-green-700 mb-1"> Transformation partielle réussie</h3>
-          <pre className="text-xs">{JSON.stringify(decrypted, null, 2)}</pre>
+          <pre className="text-xs whitespace-pre-wrap bg-white p-2">{JSON.stringify(decrypted, null, 2)}</pre>
           <button
             onClick={handleFinalDecrypt}
-            className="bg-green-600 text-white mt-2 px-4 py-1 rounded"
+            className={`bg-green-600 text-white mt-2 px-4 py-1 rounded ${buttonBase} `}
           >
             Déchiffrement final
           </button>

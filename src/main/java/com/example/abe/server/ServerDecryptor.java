@@ -25,8 +25,9 @@ public class ServerDecryptor {
             System.out.println(" Accès refusé : attributs insuffisants.");
             return null;
         }
-
         Element A = recurse(ct.policy, tk.getTkMap(), attrs);
+System.out.println("c0 : " + ct.C0.getField());
+System.out.println("tk : " + tk.getD().getField());
 
         Element top = pairing.pairing(ct.C0, tk.getD()).getImmutable();
         Element transCT = top.div(A).getImmutable();
@@ -45,13 +46,13 @@ public class ServerDecryptor {
             Element[] dk = tkMap.get(node.attr);          
             if (dk == null) throw new IllegalStateException("DK manquant pour " + node.attr);
 
+               
             Element e1 = pairing.pairing(dk[0], node.C).getImmutable();
             Element e2 = pairing.pairing(dk[1], node.C_prime).getImmutable();
             Element ratio = e1.div(e2).getImmutable();
 
-            Element wi = weightForX(node.xIndex);
 
-            return ratio.powZn(wi).getImmutable();
+            return ratio;
         }
 
        
@@ -59,8 +60,11 @@ public class ServerDecryptor {
         Element right = recurse(node.right, tkMap, attrs);
 
         if ("AND".equalsIgnoreCase(node.operator)) {
-            if (left == null || right == null) return null;   
-            return left.mul(right).getImmutable();          
+            if (left == null || right == null) return null; 
+            
+            Element leftPart = left.powZn(weightForX(node.left.xIndex)).getImmutable();
+            Element rightPart = right.powZn(weightForX(node.right.xIndex)).getImmutable();
+            return leftPart.mul(rightPart).getImmutable();          
         } else { 
             return (left != null) ? left : right;             
         }

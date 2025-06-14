@@ -22,46 +22,19 @@ public CipherText outEncrypt(PreCiphertext preCT, Map<String, Element[]> up) {
 
     // Parcours récursif de l'arbre pour construire C_i et C_i′
     traverse(preCT.root, up);
-
+    preCT.root.prepareForSerialization();
 
     return new CipherText(preCT.C, preCT.encryptedMsg, preCT.root);
 }
-/*private void traverse(AccessTreeNode node, Map<String, Element[]> up) {
-    if (node.isLeaf()) {
-        String attr = node.attr;
 
-        Element[] upPair = up.get(attr);
-        if (upPair == null) {
-            throw new IllegalArgumentException("Clé publique manquante pour l'attribut : " + attr);
-        }
 
-        Element up1 = upPair[0];
-        Element up2 = upPair[1];
-
-        node.C= up1.powZn(node.preC).getImmutable();
-
-        // C_i′ = up2^lambda
-        node.C_prime= up2.powZn(node.preC).getImmutable();
-
-       
-    } else {
-        traverse(node.left,  up);
-        traverse(node.right, up);
-    }
-}*/
-
-private void traverse(AccessTreeNode node, Map<String, Element[]> up) {
+public void traverse(AccessTreeNode node, Map<String, Element[]> up) {
     if (node.isLeaf()) {
         String attr = node.attr;
 
         Element[] upPair = up.get(attr);
       
-        Element up1 = upPair[0];
-        Element up2 = upPair[1];
-System.out.println(" Attribut = " + node.attr);
-System.out.println("    up1 null ? " + (up1 == null));
-System.out.println("    up2 null ? " + (up2 == null));
-
+    
         node.C = upPair[0].powZn(node.preC).getImmutable();
         node.C_prime = upPair[1].powZn(node.preC).getImmutable();
 
