@@ -151,25 +151,74 @@ Une fois les calculs validés, j’ai encapsulé toute la logique dans une API R
 
 ---
 
-###  5. Développement de l’interface graphique (React)
+###  5.  Développement de l’interface graphique (React)
+J’ai développé une interface utilisateur graphique avec React.js et TailwindCSS, permettant de simuler les principales interactions avec le système ABE de manière visuelle et intuitive. Cette interface sert d’outil de démonstration et de simulateur pédagogique, plutôt que d’une interface de production finale.
 
-Enfin, j’ai développé une **interface utilisateur graphique** en React.js :
-- Utilisation de **React + TailwindCSS** pour une UI moderne,
-- Intégration des appels à l’API REST avec **Axios**,
-- Interfaces pour :
-  - Définir les attributs,
-  - Générer les clés,
-  - Chiffrer un message selon une politique,
-  - Déchiffrer un message si la politique est satisfaite.
+**Technologies utilisées :**
+- React.js pour la structure de l’interface,
 
-Cela permet à l’utilisateur non technique d’interagir simplement avec un système cryptographique avancé.
+- TailwindCSS pour le design réactif et moderne,
 
-Exemple de la vue utilisateur : 
-![ScreenShot](./assets/UserView.png)
+- Axios pour les appels aux endpoints de l’API REST backend.
+
+ **Deux rôles simulés dans une seule interface :**
+
+L’interface React regroupe à la fois les fonctionnalités destinées :
+
+- à l’administrateur (initialisation, définition des attributs),
+
+- et à l’utilisateur (génération de clés, chiffrement, déchiffrement).
+
+**NB :** Dans un cadre professionnel réel, ces deux rôles seraient séparés avec des interfaces ou accès distincts.
+#### Déroulement de l’utilisation (Vue d’ensemble)
+ **Partie administrateur :**
+
+- L’administrateur commence par cliquer sur « Initialiser le système » pour exécuter le setup.
+
+- Ensuite, il définit les attributs globaux (ex. : student, iot, admin) en cliquant sur le bouton « Définir les attributs » (voir capture ci-dessous).
+
+- Ces étapes préparent le système pour la génération de clés et les politiques de chiffrement.
 
 Exemple de la vue admin : 
 ![ScreenShot](./assets/adminView.png)
 
+**Partie utilisateur :**
+
+La section utilisateur simule les deux rôles :
+
+- envoyeur (celui qui chiffre),
+
+- lecteur (celui qui déchiffre).
+
+Dans un système réel, ces rôles seraient répartis entre différents utilisateurs.
+
+Voici le déroulement :
+
+1. L’utilisateur saisit un message à chiffrer et une politique d’accès (ex. : student AND iot) — cela définit quels attributs sont nécessaires pour lire la donnée.
+
+2. Il saisit ensuite ses propres attributs utilisateur (ex. : student,iot) — simulant le rôle du lecteur.
+
+3. Il clique sur « Générer mes clés » pour produire sa clé publique (EK) et sa clé privée (DK).
+
+4. Il clique sur « Chiffrer » pour effectuer le chiffrement client + serveur.
+
+5. Il clique ensuite sur « Déchiffrer » pour initier le déchiffrement partiel côté serveur.
+
+6. Enfin, il clique sur « Déchiffrement final » pour voir le message original en clair.
+
+Exemple Interface utilisateur :
+![ScreenShot](./assets/UserView.png)
+
+#### Remarques importantes
+La partie utilisateur regroupe les deux rôles (émetteur et récepteur), ce qui est pratique pour tester, mais ne reflète pas une architecture réelle où ces rôles sont souvent séparés.
+
+Cette interface React permet une visualisation complète du flux cryptographique ABE sans nécessiter de connaissances techniques avancées.
+
+Elle constitue une preuve de concept fonctionnelle pour valider les étapes du projet.
+
+Un Exemple de resultat final lors de déchiffrement : 
+
+![ScreenShot](./assets/FinalView.png)
 ---
 
 
